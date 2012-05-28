@@ -1,6 +1,6 @@
 #rpc-stream
 
-`RpcStream` is a dead simple rpc system that works over any full-duplex text/byte/json stream.
+`RpcStream` is a dead simple (75 loc) rpc system that works over any full-duplex text/byte/json stream.
 
 ## rant
 
@@ -21,7 +21,7 @@ I should just be able to do this:
 ```
 RPC framework (AHEM! RPC MODULE!), _you_ just worry about calling the right function, _I'll_ decide where you go...
 
-This is where I will say "you can also do this with dnode", when dnode supports this :)
+This is where I will say "you can also do this with dnode", when [dnode](https://github.com/substack/dnode) supports this :)
 
 ## usage
 
