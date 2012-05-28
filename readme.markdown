@@ -11,11 +11,11 @@ I should just be able to do this:
 
 ``` js
   RPC
-    .pipe(ENCYPT_STREAM) //ssh already encrypts, but I'm paranoid
     .pipe(GZIP_STREAM)
+    .pipe(ENCYPT_STREAM) //ssh already encrypts, but I'm paranoid
     .pipe(REMOTE_SSH_STREAM)
-    .pipe(GUNZIP_STREAM)
     .pipe(DECRYPT_STREAM)
+    .pipe(GUNZIP_STREAM)
     .pipe(RPC)
   //with something very similar on the other side.
 ```
