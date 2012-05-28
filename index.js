@@ -3,6 +3,12 @@ var es = require('event-stream')
 module.exports = function (obj, raw) {
   obj = obj || {}
   var cbs = {}, count = 1
+  function flattenError(err) {
+    if(err instanceof Error)
+      for(var k in err)
+        err[k] = err[k] //flatten so err stringifies 
+    return err
+  }
   var s = es.through(function (data) {
     //write - on incoming call 
     data = data.slice()
@@ -12,12 +18,14 @@ module.exports = function (obj, raw) {
     if(name != null) {
       args.push(function () {
         var args = [].slice.call(arguments)
+        flattenError(args[0])
         if(~i) s.emit('data', [args, i]) //responses don't have a name.
       })
       try {
         obj[name].apply(obj, args)
       } catch (err) {
-        if(~i) s.emit('data', [[err], i])
+        console.error(err ? err.stack : err)
+       if(~i) s.emit('data', [[flattenError(err)], i])
       }
     } else if(!cbs[i]) {
       //this is some kind of error.
