@@ -1,9 +1,6 @@
 var es = require('event-stream')
-var Stream = require('stream').Stream
 
-module.exports = Rpc
-
-function Rpc(obj) {
+module.exports = function (obj, raw) {
   obj = obj || {}
   var cbs = {}, count = 1
   var s = es.through(function (data) {
@@ -66,6 +63,13 @@ function Rpc(obj) {
     })
     return w
   }
-
-  return s
+  if(raw)
+    return s
+  var parse = es.parse()
+  //if not 'raw', wrap the string to return
+  var duplex = es.duplex(parse
+              , parse.pipe(s).pipe(es.stringify()))
+  duplex.wrap = s.wrap
+  duplex.rpc = s.rpc
+  return duplex
 }
