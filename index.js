@@ -64,8 +64,9 @@ module.exports = function (obj, raw) {
     ).forEach(function (k) {
       w[k] = function () {
         var args = [].slice.call(arguments)
-        if('function' == typeof args[args.length - 1])
-          cb = args.pop()
+        var cb = ('function' == typeof args[args.length - 1])
+                 ? args.pop()
+                 : function(){}
         rpc(k, args, cb)
       }
     })
