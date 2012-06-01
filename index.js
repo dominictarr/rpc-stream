@@ -66,7 +66,7 @@ module.exports = function (obj, raw) {
         var args = [].slice.call(arguments)
         var cb = ('function' == typeof args[args.length - 1])
                  ? args.pop()
-                 : function(){}
+                 : null
         rpc(k, args, cb)
       }
     })
