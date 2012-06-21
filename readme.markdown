@@ -4,7 +4,8 @@
 
 ## rant
 
-There are a bunch of people have already written node rpc systems, but non of them has done it _right_ yet.
+
+There are a bunch of people have already written node rpc systems, but most of them has done it _right_ yet.
 My beef is that all these systems is that they are tightly coupled to, or wrapped around servers. what if I want to encrypt the messages? what if I want to send the messages over stdin/out, or over ssh? of write them to a temp file? there is one abstraction that matches all of these cases; the `Stream`
 
 I should just be able to do this:
@@ -21,7 +22,7 @@ I should just be able to do this:
 ```
 RPC framework (AHEM! RPC MODULE!), _you_ just worry about calling the right function, _I'll_ decide where you go...
 
-This is where I will say "you can also do this with dnode", when [dnode](https://github.com/substack/dnode) supports this :)
+update: [dnode@1.0.0](https://github.com/substack/dnode) now has first class streams, and you can pipe it where you like! 
 
 ## usage
 
