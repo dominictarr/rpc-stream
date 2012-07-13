@@ -11,13 +11,14 @@ My beef is that all these systems is that they are tightly coupled to, or wrappe
 I should just be able to do this:
 
 ``` js
-  RPC
-    .pipe(GZIP_STREAM)
-    .pipe(ENCYPT_STREAM) //ssh already encrypts, but I'm paranoid
-    .pipe(REMOTE_SSH_STREAM)
-    .pipe(DECRYPT_STREAM)
+  REMOTE_SSH_STREAM           //<-- pipe data from a remote source
+    .pipe(DECRYPT_STREAM)    //through some ('middleware') streams (ssh already encrypts, but I'm paranoid)
     .pipe(GUNZIP_STREAM)
-    .pipe(RPC)
+    .pipe(RPC)               //<--- pipe the data through the RPC system.
+    .pipe(GZIP_STREAM)
+    .pipe(ENCYPT_STREAM)
+    .pipe(REMOTE_SSH_STREAM)  //<-- and back to the remote
+
   //with something very similar on the other side.
 ```
 RPC framework (AHEM! RPC MODULE!), _you_ just worry about calling the right function, _I'll_ decide where you go...
