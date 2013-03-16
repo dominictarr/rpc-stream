@@ -33,21 +33,20 @@ var rpc = require('rpc-stream')
 //create a server, that answers questions.
 //pass in functions that may be called remotely.
 var server = rpc({hello: function (name, cb) {
-      cb(null, 'hello, '+name)
-    })
+  cb(null, 'hello, '+name)
+}})
 
 //create a client, that asks questions.
 var client = rpc()
 
-  //pipe rpc instances together!
-  client.pipe(server).pipe(client)
+//pipe rpc instances together!
+client.pipe(server).pipe(client)
 
-  var remote = client.wrap(['hello']
-  remote.hello('JIM', function (err, mess) {
-    if(err) throw err
-    console.log(mess)
-  })
-
+var remote = client.wrap(['hello'])
+remote.hello('JIM', function (err, mess) {
+  if(err) throw err
+  console.log(mess)
+})
 ```
 
 ### rpc(methods, isRaw)
