@@ -51,7 +51,8 @@ remote.hello('JIM', function (err, mess) {
 
 ### rpc(methods, isRaw)
 
-returns a `RpcStream` that will call `methods` when written to.
+returns a `RpcStream` that will call `methods` when written to. If the `isRaw` parameter is set to `true`, `JSON.stringify()`
+is turned off and you just get a stream of objects, in case you want to do your own parsing/stringifying.
 
 ### RpcStream\#wrap(methodNames)
 
