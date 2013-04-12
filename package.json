@@ -8,9 +8,11 @@
     "url": "git://github.com/dominictarr/rpc-stream.git"
   },
   "dependencies": {
-    "event-stream": "~2"
+    "stream-serializer": "~1.0.0",
+    "through": "~2.2.7"
   },
   "devDependencies": {
+    "event-stream": "~2",
     "request": "~2.9.202"
   },
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)",
