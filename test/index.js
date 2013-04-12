@@ -1,4 +1,4 @@
-var rpc = require('..')
+var rpc = require('../')
 var es  = require('event-stream')
 
 var obj = {
