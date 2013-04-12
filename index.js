@@ -1,15 +1,24 @@
-var es = require('event-stream')
+var through = require('through')
+var serialize = require('stream-serializer')()
+
+function get(obj, path) {
+  if(Array.isArray(path)) {
+    for(var i in path)
+      obj = obj[path[i]]
+    return obj
+  }
+  return obj[path]
+}
 
 module.exports = function (obj, raw) {
-  obj = obj || {}
-  var cbs = {}, count = 1
+  var cbs = {}, count = 1, local = obj || {}
   function flattenError(err) {
     if(err instanceof Error)
       for(var k in err)
         err[k] = err[k] //flatten so err stringifies 
     return err
   }
-  var s = es.through(function (data) {
+  var s = through(function (data) {
     //write - on incoming call 
     data = data.slice()
     var i = data.pop(), args = data.pop(), name = data.pop()
@@ -56,29 +65,33 @@ module.exports = function (obj, raw) {
     return keys
   }
 
-  s.wrap = function (remote) {
+  s.createRemoteCall = function (name) {
+    return function () {
+      var args = [].slice.call(arguments)
+      var cb = ('function' == typeof args[args.length - 1])
+               ? args.pop()
+               : null
+      rpc(name, args, cb)
+    }
+  }
+
+  s.createLocalCall = function (name, fn) {
+     local[name] = fn
+  }
+
+  s.wrap = function (remote, _path) {
+    _path = _path || []
     var w = {}
     ;(Array.isArray(remote)     ? remote
     : 'string' == typeof remote ? [remote]
     : remote = keys(remote)
     ).forEach(function (k) {
-      w[k] = function () {
-        var args = [].slice.call(arguments)
-        var cb = ('function' == typeof args[args.length - 1])
-                 ? args.pop()
-                 : null
-        rpc(k, args, cb)
-      }
+      w[k] = s.createRemoteCall(k)
     })
     return w
   }
   if(raw)
     return s
-  var parse = es.parse()
-  //if not 'raw', wrap the string to return
-  var duplex = es.duplex(parse
-              , parse.pipe(s).pipe(es.stringify()))
-  duplex.wrap = s.wrap
-  duplex.rpc = s.rpc
-  return duplex
+
+  return serialize(s)
 }
