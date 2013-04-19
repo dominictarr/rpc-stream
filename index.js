@@ -25,16 +25,15 @@ module.exports = function (obj, raw) {
     //if(~i) then there was no callback.    
 
     if(name != null) {
-      args.push(function () {
+      var cb = function () {
         var args = [].slice.call(arguments)
         flattenError(args[0])
         if(~i) s.emit('data', [args, i]) //responses don't have a name.
-      })
+      }
       try {
-        local[name].apply(obj, args)
+        local[name].call(obj, args, cb)
       } catch (err) {
-        console.error(err ? err.stack : err)
-       if(~i) s.emit('data', [[flattenError(err)], i])
+        if(~i) s.emit('data', [[flattenError(err)], i])
       }
     } else if(!cbs[i]) {
       //this is some kind of error.
@@ -45,6 +44,7 @@ module.exports = function (obj, raw) {
 
       return console.error('ERROR: unknown callback id: '+i, data)
     } else {
+      //call the callback.
       cbs[i].apply(null, args)
       delete cbs[i] //no longer need this
     }
@@ -56,6 +56,8 @@ module.exports = function (obj, raw) {
     //that is 900 million million. 
     //if you reach that, dm me, 
     //i'll buy you a beer. @dominictarr
+    if('string' !== typeof name)
+      throw new Error('name *must* be string')
     s.emit('data', [name, args, cb ? count : -1])
   }
 
