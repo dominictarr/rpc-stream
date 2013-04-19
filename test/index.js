@@ -38,7 +38,6 @@ function sync(source, serial) {
 
 test('tcp', function (t) {
   var net = require('net')
-  var request = require('request')
   var port = Math.round(40000 * Math.random()) + 1000
   var a = rpc(obj)
   var b = rpc()
