@@ -13,14 +13,11 @@
   },
   "devDependencies": {
     "event-stream": "~2",
-    "request": "~2.9.202"
+    "tape": "~0.3.3"
   },
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)",
   "optionalDependencies": {},
-  "engines": {
-    "node": "*"
-  },
   "scripts": {
-    "test": "asynct test/*.js"
+    "test": "node test/index.js"
   }
 }
