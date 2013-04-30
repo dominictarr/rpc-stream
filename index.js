@@ -12,20 +12,22 @@ module.exports = function (obj, raw) {
   var s = es.through(function (data) {
     //write - on incoming call 
     data = data.slice()
-    var i = data.pop(), args = data.pop(), name = data.pop()
+    console.error('data', data);
+    //var i = data.pop(), args = data.pop(), name = data.pop()
+    var i = data.pop(), name = data.pop(), args = data
     //if(~i) then there was no callback.    
 
     if(name != null) {
       args.push(function () {
         var args = [].slice.call(arguments)
         flattenError(args[0])
-        if(~i) s.emit('data', [args, i]) //responses don't have a name.
+        if(~i) s.emit('data', args.concat([null, i])) //responses don't have a name.
       })
       try {
         obj[name].apply(obj, args)
       } catch (err) {
         console.error(err ? err.stack : err)
-       if(~i) s.emit('data', [[flattenError(err)], i])
+       if(~i) s.emit('data', [flattenError(err)].concat([null, i]))
       }
     } else if(!cbs[i]) {
       //this is some kind of error.
@@ -47,7 +49,8 @@ module.exports = function (obj, raw) {
     //that is 900 million million. 
     //if you reach that, dm me, 
     //i'll buy you a beer. @dominictarr
-    s.emit('data', [name, args, cb ? count : -1])
+    //s.emit('data', [name, args, cb ? count : -1])
+    s.emit('data', args.concat([name, cb ? count : -1]))
   }
 
   function keys (obj) {
