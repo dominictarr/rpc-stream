@@ -33,26 +33,26 @@ var rpc = require('rpc-stream')
 //create a server, that answers questions.
 //pass in functions that may be called remotely.
 var server = rpc({hello: function (name, cb) {
-      cb(null, 'hello, '+name)
-    })
+  cb(null, 'hello, '+name)
+}})
 
 //create a client, that asks questions.
 var client = rpc()
 
-  //pipe rpc instances together!
-  client.pipe(server).pipe(client)
+//pipe rpc instances together!
+client.pipe(server).pipe(client)
 
-  var remote = client.wrap(['hello']
-  remote.hello('JIM', function (err, mess) {
-    if(err) throw err
-    console.log(mess)
-  })
-
+var remote = client.wrap(['hello'])
+remote.hello('JIM', function (err, mess) {
+  if(err) throw err
+  console.log(mess)
+})
 ```
 
 ### rpc(methods, isRaw)
 
-returns a `RpcStream` that will call `methods` when written to.
+returns a `RpcStream` that will call `methods` when written to. If the `isRaw` parameter is set to `true`, `JSON.stringify()`
+is turned off and you just get a stream of objects, in case you want to do your own parsing/stringifying.
 
 ### RpcStream\#wrap(methodNames)
 

@@ -1,33 +1,40 @@
-var es = require('event-stream')
+var through = require('through')
+var serialize = require('stream-serializer')()
+
+function get(obj, path) {
+  if(Array.isArray(path)) {
+    for(var i in path)
+      obj = obj[path[i]]
+    return obj
+  }
+  return obj[path]
+}
 
 module.exports = function (obj, raw) {
-  obj = obj || {}
-  var cbs = {}, count = 1
+  var cbs = {}, count = 1, local = obj || {}
   function flattenError(err) {
     if(err instanceof Error)
       for(var k in err)
         err[k] = err[k] //flatten so err stringifies 
     return err
   }
-  var s = es.through(function (data) {
+  var s = through(function (data) {
     //write - on incoming call 
     data = data.slice()
-    console.error('data', data);
     //var i = data.pop(), args = data.pop(), name = data.pop()
     var i = data.pop(), name = data.pop(), args = data
     //if(~i) then there was no callback.    
 
     if(name != null) {
-      args.push(function () {
+      var cb = function () {
         var args = [].slice.call(arguments)
         flattenError(args[0])
         if(~i) s.emit('data', args.concat([null, i])) //responses don't have a name.
-      })
+      }
       try {
-        obj[name].apply(obj, args)
+        local[name].call(obj, args, cb)
       } catch (err) {
-        console.error(err ? err.stack : err)
-       if(~i) s.emit('data', [flattenError(err)].concat([null, i]))
+        if(~i) s.emit('data', [flattenError(err)].concat([null, i]))
       }
     } else if(!cbs[i]) {
       //this is some kind of error.
@@ -38,6 +45,7 @@ module.exports = function (obj, raw) {
 
       return console.error('ERROR: unknown callback id: '+i, data)
     } else {
+      //call the callback.
       cbs[i].apply(null, args)
       delete cbs[i] //no longer need this
     }
@@ -49,7 +57,8 @@ module.exports = function (obj, raw) {
     //that is 900 million million. 
     //if you reach that, dm me, 
     //i'll buy you a beer. @dominictarr
-    //s.emit('data', [name, args, cb ? count : -1])
+    if('string' !== typeof name)
+      throw new Error('name *must* be string')
     s.emit('data', args.concat([name, cb ? count : -1]))
   }
 
@@ -59,29 +68,33 @@ module.exports = function (obj, raw) {
     return keys
   }
 
-  s.wrap = function (remote) {
+  s.createRemoteCall = function (name) {
+    return function () {
+      var args = [].slice.call(arguments)
+      var cb = ('function' == typeof args[args.length - 1])
+               ? args.pop()
+               : null
+      rpc(name, args, cb)
+    }
+  }
+
+  s.createLocalCall = function (name, fn) {
+     local[name] = fn
+  }
+
+  s.wrap = function (remote, _path) {
+    _path = _path || []
     var w = {}
     ;(Array.isArray(remote)     ? remote
     : 'string' == typeof remote ? [remote]
     : remote = keys(remote)
     ).forEach(function (k) {
-      w[k] = function () {
-        var args = [].slice.call(arguments)
-        var cb = ('function' == typeof args[args.length - 1])
-                 ? args.pop()
-                 : null
-        rpc(k, args, cb)
-      }
+      w[k] = s.createRemoteCall(k)
     })
     return w
   }
   if(raw)
     return s
-  var parse = es.parse()
-  //if not 'raw', wrap the string to return
-  var duplex = es.duplex(parse
-              , parse.pipe(s).pipe(es.stringify()))
-  duplex.wrap = s.wrap
-  duplex.rpc = s.rpc
-  return duplex
+
+  return serialize(s)
 }

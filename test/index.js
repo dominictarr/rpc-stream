@@ -1,5 +1,6 @@
-var rpc = require('..')
-var es  = require('event-stream')
+var rpc  = require('../')
+var es   = require('event-stream')
+var test = require('tape')
 
 var obj = {
   hello: function (name, cb) {
@@ -7,7 +8,7 @@ var obj = {
   }
 }
 
-exports['simple'] = function (t) {
+test('simple', function (t) {
 
   //second arg=true means stream of raw js objects,
   //do not stringify/parse.
@@ -29,15 +30,14 @@ exports['simple'] = function (t) {
     console.log(message)
   })
   t.end()
-}
+})
 
 function sync(source, serial) {
   source.pipe(serial).pipe(source)
 }
 
-exports.tcp = function (t) {
+test('tcp', function (t) {
   var net = require('net')
-  var request = require('request')
   var port = Math.round(40000 * Math.random()) + 1000
   var a = rpc(obj)
   var b = rpc()
@@ -56,26 +56,18 @@ exports.tcp = function (t) {
       t.end()
     })
   })
-}
+})
 
-if(!module.parent) { 
-  var a = rpc({
-    hello: function (n, cb) {
-      console.error('child: HELLO ', n)
-      cb(null, 'HELLO ' + n)
-    }
-  })
-  console.error('obj', obj)
-  a.pipe(es.duplex(process.stdout, process.stdin)).pipe(a)
-  process.stdin.resume()
-}
 
-exports.cp = function(t) {
-  var cp = require('child_process').spawn(process.execPath, [__filename])
+var path = require('path')
+
+test('child_process', function(t) {
+  var cp = require('child_process')
+  .spawn(process.execPath, [require.resolve('./cp')])
   var b = rpc()
 
   b.pipe(es.duplex(cp.stdin, cp.stdout)).pipe(b)
-
+  
   cp.stderr.pipe(process.stderr, {end: false})
   b.wrap('hello').hello('WHO?', function (err, mes) {
     if(err) throw err
@@ -83,5 +75,5 @@ exports.cp = function(t) {
     cp.kill()
     t.end()
   })
-}
+})
 
