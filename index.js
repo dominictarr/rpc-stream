@@ -36,11 +36,11 @@ module.exports = function (obj, raw) {
         if(~i) s.emit('data', [[flattenError(err)], i])
       }
     } else if(!cbs[i]) {
-      //this is some kind of error.
-      //either end is mixed up,
-      //or the called twice.
+      //there is no callback with that id.
+      //either one end mixed up the id or
+      //it was called twice.
       //log this error, but don't throw.
-      //this process shouldn't crash because that one did wrong
+      //this process shouldn't crash because another did wrong
 
       return console.error('ERROR: unknown callback id: '+i, data)
     } else {
