@@ -31,7 +31,7 @@ module.exports = function (obj, raw) {
         if(~i) s.emit('data', [args, i]) //responses don't have a name.
       }
       try {
-        local[name].call(obj, args, cb)
+        local[name].apply(obj, args.concat(cb))
       } catch (err) {
         if(~i) s.emit('data', [[flattenError(err)], i])
       }
