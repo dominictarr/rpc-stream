@@ -32,13 +32,14 @@ module.exports = function (obj, raw) {
     var i = data.pop(), args = data.pop(), name = data.pop()
     //if(~i) then there was no callback.    
 
+    if (args[0]) args[0] = expandError(args[0])
+
     if(name != null) {
       var cb = function () {
         var args = [].slice.call(arguments)
         args[0] = flattenError(args[0])
         if(~i) s.emit('data', [args, i]) //responses don't have a name.
       }
-      if (args[0]) args[0] = expandError(args[0])
       try {
         local[name].apply(obj, args.concat(cb))
       } catch (err) {
