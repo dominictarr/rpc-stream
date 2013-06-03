@@ -13,10 +13,11 @@ function get(obj, path) {
 module.exports = function (obj, raw) {
   var cbs = {}, count = 1, local = obj || {}
   function flattenError(err) {
-    if(err instanceof Error)
-      for(var k in err)
-        err[k] = err[k] //flatten so err stringifies 
-    return err
+    if(!(err instanceof Error)) return err
+    var err2 = { message: err.message }
+    for(var k in err)
+      err2[k] = err[k] //flatten so err stringifies 
+    return err2
   }
   var s = through(function (data) {
     //write - on incoming call 
@@ -27,7 +28,7 @@ module.exports = function (obj, raw) {
     if(name != null) {
       var cb = function () {
         var args = [].slice.call(arguments)
-        flattenError(args[0])
+        args[0] = flattenError(args[0])
         if(~i) s.emit('data', [args, i]) //responses don't have a name.
       }
       try {
