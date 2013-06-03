@@ -4,14 +4,13 @@ var test = require('tap').test
 test('single arg', function (t) {
   t.plan(2)
 
-  var a = rpc({
-    hello: function (cb) { cb(null, 'hello') }
-  })
   var b = rpc()
-  a.pipe(b).pipe(a)
+  b.pipe(rpc({
+    hello: function (cb) { cb(null, 'hello') }
+  })).pipe(b)
 
   b.createRemoteCall('hello')(function (err, str) {
-    t.equal(err, null)
+    t.notOk(err)
     t.equal(str, 'hello')
-  });
+  })
 })

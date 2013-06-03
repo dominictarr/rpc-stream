@@ -16,7 +16,14 @@ module.exports = function (obj, raw) {
     if(!(err instanceof Error)) return err
     var err2 = { message: err.message }
     for(var k in err)
-      err2[k] = err[k] //flatten so err stringifies 
+      err2[k] = err[k] 
+    return err2
+  }
+  function expandError(err) {
+    if (!err || !err.message) return err
+    var err2 = new Error(err.message)
+    for(var k in err)
+      err2[k] = err[k]
     return err2
   }
   var s = through(function (data) {
@@ -31,6 +38,7 @@ module.exports = function (obj, raw) {
         args[0] = flattenError(args[0])
         if(~i) s.emit('data', [args, i]) //responses don't have a name.
       }
+      if (args[0]) args[0] = expandError(args[0])
       try {
         local[name].apply(obj, args.concat(cb))
       } catch (err) {
