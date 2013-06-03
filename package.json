@@ -18,6 +18,6 @@
   "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)",
   "optionalDependencies": {},
   "scripts": {
-    "test": "node test/index.js"
+    "test": "tap test/*.js"
   }
 }

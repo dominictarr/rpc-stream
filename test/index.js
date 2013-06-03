@@ -63,7 +63,7 @@ var path = require('path')
 
 test('child_process', function(t) {
   var cp = require('child_process')
-  .spawn(process.execPath, [require.resolve('./cp')])
+  .spawn(process.execPath, [require.resolve('./support/cp')])
   var b = rpc()
 
   b.pipe(es.duplex(cp.stdin, cp.stdout)).pipe(b)
