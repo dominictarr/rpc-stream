@@ -6,7 +6,7 @@ test('single arg', function (t) {
 
   var b = rpc()
   b.pipe(rpc({
-    hello: function (cb) { cb(null, 'hello') }
+    hello: function (args, cb) { cb(null, 'hello') }
   })).pipe(b)
 
   b.createRemoteCall('hello')(function (err, str) {

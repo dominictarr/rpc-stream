@@ -6,7 +6,7 @@ test('error', function (t) {
 
   var b = rpc()
   b.pipe(rpc({
-    hello: function (cb) {
+    hello: function (args, cb) {
       var err = new Error('oops');
       err.foo = 'bar';
       cb(err);
