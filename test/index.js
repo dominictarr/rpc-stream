@@ -19,22 +19,17 @@ test('simple', function (t) {
   b.pipe(a).pipe(b)
 
   b.rpc('hello', ['JIM'], function (err, message) {
-    if(err) throw err
-    console.log(message)
+    t.error(err)
+    t.equal(message, 'HI, JIM')
   })
 
   var B = b.wrap('hello')
-  console.log(B)
   B.hello('JIM', function (err, message) {
-    if(err) throw err
-    console.log(message)
+    t.error(err)
+    t.equal(message, 'HI, JIM')
+    t.end()
   })
-  t.end()
 })
-
-function sync(source, serial) {
-  source.pipe(serial).pipe(source)
-}
 
 test('tcp', function (t) {
   var net = require('net')
@@ -48,7 +43,6 @@ test('tcp', function (t) {
     b.pipe(net.connect(port)).pipe(b)
     
     b.wrap('hello').hello('SILLY', function (err, mes) {
-      console.log(mes)
       t.equal(mes, 'HI, SILLY')
       a.end()
       b.end()
@@ -70,7 +64,7 @@ test('child_process', function(t) {
   
   cp.stderr.pipe(process.stderr, {end: false})
   b.wrap('hello').hello('WHO?', function (err, mes) {
-    if(err) throw err
+    t.error(err)
     t.equal(mes, 'HELLO WHO?')
     cp.kill()
     t.end()
