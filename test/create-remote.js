@@ -15,18 +15,18 @@ test('simple', function (t) {
   var a = rpc(null, true)
   b = rpc(null, true)
 
-  a.createLocalCall('echo', function (args, cb) {
-    t.ok(args)
-    cb(null, args)
+  a.createLocalCall('echo', function (x, y, cb) {
+    t.ok(x)
+    t.ok(y)
+    cb(null, x, y)
   })
-
 
   var echo = b.createRemoteCall('echo')
   //a and b are streams. connect them with pipe.
   b.pipe(a).pipe(b)
   var r1 = Math.random(), r2 = Math.random()
-  echo(r1, r2, function (err, args) {
-    t.deepEqual(args, [r1, r2])
+  echo(r1, r2, function (err, _r1, _r2) {
+    t.deepEqual([_r1, _r2], [r1, r2])
     t.end()
   })
 })
