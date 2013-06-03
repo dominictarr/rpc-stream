@@ -1,5 +1,5 @@
 var rpc = require('../')
-var test = require('tap').test
+var test = require('tape')
 
 test('error', function (t) {
   t.plan(3)
