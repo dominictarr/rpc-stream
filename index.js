@@ -62,13 +62,13 @@ module.exports = function (obj, raw) {
 
   var rpc = s.rpc = function (name, args, cb) {
     if(cb) cbs[++count] = cb
-    if(count == 9007199254740992) count = 0 //reset if max
-    //that is 900 million million. 
-    //if you reach that, dm me, 
-    //i'll buy you a beer. @dominictarr
     if('string' !== typeof name)
       throw new Error('name *must* be string')
     s.emit('data', [name, args, cb ? count : -1])
+    if(cb && count == 9007199254740992) count = 0 //reset if max
+    //that is 900 million million.
+    //if you reach that, dm me,
+    //i'll buy you a beer. @dominictarr
   }
 
   function keys (obj) {
