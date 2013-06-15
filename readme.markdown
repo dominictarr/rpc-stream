@@ -1,6 +1,7 @@
 #rpc-stream
 
 `RpcStream` is a dead simple (75 loc) rpc system that works over any full-duplex text/byte/json stream.
+There's also a [Python port](https://github.com/riga/rpyc-stream), e.g. for cross-language RPC-over-SSH.
 
 ## rant
 
