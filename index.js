@@ -34,7 +34,7 @@ module.exports = function (obj, raw) {
 
     if(name != null) {
       var cb = function () {
-        if(~i) return;
+        if(!~i) return;
         var args = [].slice.call(arguments)
         args[0] = flattenError(args[0])
         s.emit('data', [args, i]) //responses don't have a name.
