@@ -30,18 +30,19 @@ module.exports = function (obj, raw) {
     //write - on incoming call 
     data = data.slice()
     var i = data.pop(), args = data.pop(), name = data.pop()
-    //if(~i) then there was no callback.    
-
-    if (args[0]) args[0] = expandError(args[0])
+    //if(~i) then there was no callback.
 
     if(name != null) {
       var cb = function () {
+        if(~i) return;
         var args = [].slice.call(arguments)
         args[0] = flattenError(args[0])
-        if(~i) s.emit('data', [args, i]) //responses don't have a name.
+        s.emit('data', [args, i]) //responses don't have a name.
       }
       try {
-        local[name].call(obj, args, cb)
+        //use apply to use same signatures
+        args.push(cb);
+        local[name].apply(obj, args);
       } catch (err) {
         if(~i) s.emit('data', [[flattenError(err)], i])
       }
@@ -54,6 +55,7 @@ module.exports = function (obj, raw) {
 
       return console.error('ERROR: unknown callback id: '+i, data)
     } else {
+      if (args[0]) args[0] = expandError(args[0])
       //call the callback.
       cbs[i].apply(null, args)
       delete cbs[i] //no longer need this
@@ -62,13 +64,13 @@ module.exports = function (obj, raw) {
 
   var rpc = s.rpc = function (name, args, cb) {
     if(cb) cbs[++count] = cb
+    if(count == 9007199254740992) count = 0 //reset if max
+    //that is 900 million million. 
+    //if you reach that, dm me, 
+    //i'll buy you a beer. @dominictarr
     if('string' !== typeof name)
       throw new Error('name *must* be string')
     s.emit('data', [name, args, cb ? count : -1])
-    if(cb && count == 9007199254740992) count = 0 //reset if max
-    //that is 900 million million.
-    //if you reach that, dm me,
-    //i'll buy you a beer. @dominictarr
   }
 
   function keys (obj) {
