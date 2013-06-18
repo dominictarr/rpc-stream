@@ -3,8 +3,11 @@
 `RpcStream` is a dead simple (75 loc) rpc system that works over any full-duplex text/byte/json stream.
 There's also a [Python port](https://github.com/riga/rpyc-stream), e.g. for cross-language RPC-over-SSH.
 
-## rant
+## ports
 
+* [rpyc-stream](https://github.com/riga/rpyc-stream) Python
+
+## rant
 
 There are a bunch of people have already written node rpc systems, but most of them has done it _right_ yet.
 My beef is that all these systems is that they are tightly coupled to, or wrapped around servers. what if I want to encrypt the messages? what if I want to send the messages over stdin/out, or over ssh? of write them to a temp file? there is one abstraction that matches all of these cases; the `Stream`
