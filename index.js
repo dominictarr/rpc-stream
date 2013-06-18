@@ -10,13 +10,15 @@ function get(obj, path) {
   return obj[path]
 }
 
-module.exports = function (obj, raw) {
+module.exports = function (obj, opts) {
+  //backward compatibility
+  if (!(opts instanceof Object)) opts = { raw: opts }
   var cbs = {}, count = 1, local = obj || {}
   function flattenError(err) {
     if(!(err instanceof Error)) return err
     var err2 = { message: err.message }
     for(var k in err)
-      err2[k] = err[k] 
+      err2[k] = err[k]
     return err2
   }
   function expandError(err) {
@@ -27,7 +29,7 @@ module.exports = function (obj, raw) {
     return err2
   }
   var s = through(function (data) {
-    //write - on incoming call 
+    //write - on incoming call
     data = data.slice()
     var i = data.pop(), args = data.pop(), name = data.pop()
     //if(~i) then there was no callback.
@@ -40,9 +42,11 @@ module.exports = function (obj, raw) {
         s.emit('data', [args, i]) //responses don't have a name.
       }
       try {
-        //use apply to use same signatures
-        args.push(cb);
-        local[name].apply(obj, args);
+        if (opts.sig) {
+          //use apply to use same signatures
+          args.push(cb);
+          local[name].apply(obj, args);
+        } else local[name].call(obj, args, cb);
       } catch (err) {
         if(~i) s.emit('data', [[flattenError(err)], i])
       }
@@ -65,8 +69,8 @@ module.exports = function (obj, raw) {
   var rpc = s.rpc = function (name, args, cb) {
     if(cb) cbs[++count] = cb
     if(count == 9007199254740992) count = 0 //reset if max
-    //that is 900 million million. 
-    //if you reach that, dm me, 
+    //that is 900 million million.
+    //if you reach that, dm me,
     //i'll buy you a beer. @dominictarr
     if('string' !== typeof name)
       throw new Error('name *must* be string')
@@ -104,7 +108,7 @@ module.exports = function (obj, raw) {
     })
     return w
   }
-  if(raw)
+  if(opts.raw)
     return s
 
   return serialize(s)
