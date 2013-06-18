@@ -12,7 +12,7 @@ function get(obj, path) {
 
 module.exports = function (obj, opts) {
   //backward compatibility
-  if (!(opts instanceof Object)) opts = { raw: opts }
+  if (!(opts instanceof Object)) opts = { isRaw: opts }
   var cbs = {}, count = 1, local = obj || {}
   function flattenError(err) {
     if(!(err instanceof Error)) return err
@@ -42,7 +42,7 @@ module.exports = function (obj, opts) {
         s.emit('data', [args, i]) //responses don't have a name.
       }
       try {
-        if (opts.sig) {
+        if (opts.sameSigs && args instanceof Array) {
           //use apply to use same signatures
           args.push(cb);
           local[name].apply(obj, args);
@@ -108,7 +108,7 @@ module.exports = function (obj, opts) {
     })
     return w
   }
-  if(opts.raw)
+  if(opts.isRaw)
     return s
 
   return serialize(s)
