@@ -35,7 +35,9 @@ module.exports = function (obj, raw) {
     if (args[0]) args[0] = expandError(args[0])
 
     if(name != null) {
+      var called = 0
       var cb = function () {
+        if (called++) return
         var args = [].slice.call(arguments)
         args[0] = flattenError(args[0])
         if(~i) s.emit('data', [args, i]) //responses don't have a name.
@@ -52,6 +54,7 @@ module.exports = function (obj, raw) {
       //log this error, but don't throw.
       //this process shouldn't crash because another did wrong
 
+      s.emit('invalid callback id')
       return console.error('ERROR: unknown callback id: '+i, data)
     } else {
       //call the callback.
