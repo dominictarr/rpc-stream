@@ -55,8 +55,9 @@ module.exports = function (obj, raw) {
       return console.error('ERROR: unknown callback id: '+i, data)
     } else {
       //call the callback.
-      cbs[i].apply(null, args)
-      delete cbs[i] //no longer need this
+      var cb = cbs[i]
+      delete cbs[i] //delete cb before calling it, incase cb throws.
+      cb.apply(null, args)
     }
   })
 
