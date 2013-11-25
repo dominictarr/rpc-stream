@@ -2,13 +2,17 @@ var rpc = require('../')
 var test = require('tape')
 
 test('error', function (t) {
-  t.plan(3)
+  t.plan(4)
 
   var b = rpc()
   b.pipe(rpc({
     hello: function (args, cb) {
-      var err = new Error('oops');
-      err.foo = 'bar';
+      var err = new Error('oops')
+      err.foo = 'bar'
+      Object.defineProperty(err, 'bar', {
+        value: 'baz',
+        enumerable: false
+      })
       cb(err);
     }
   })).pipe(b)
@@ -17,5 +21,6 @@ test('error', function (t) {
     t.ok(err instanceof Error, 'instanceof')
     t.equal(err.message, 'oops', 'message')
     t.equal(err.foo, 'bar', 'custom properties')
+    t.equal(err.bar, 'baz', 'non enumerable properties')
   })
 })
