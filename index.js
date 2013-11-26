@@ -1,7 +1,10 @@
 var through = require('through')
 var serialize = require('stream-serializer')()
-var getOwnPropertyNames = Object.getOwnPropertyNames || Object.keys || function(obj) {
-  var ret = []
+
+function allKeys(obj) {
+  var ret = Object.getOwnPropertyNames
+    ? Object.getOwnPropertyNames(obj)
+    : []
   for(var k in obj)
     ret.push(k)
   return ret
@@ -21,7 +24,7 @@ module.exports = function (obj, raw) {
   function flattenError(err) {
     if(!(err instanceof Error)) return err
     var err2 = { message: err.message }
-    var props = getOwnPropertyNames(err)
+    var props = allKeys(err)
     for(var i=0; i<props.length; i++)
       err2[props[i]] = err[props[i]]
     return err2
