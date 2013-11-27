@@ -50,10 +50,27 @@ remote.hello('JIM', function (err, mess) {
 })
 ```
 
-### rpc(methods, isRaw)
+### rpc(methods, opts)
 
-returns a `RpcStream` that will call `methods` when written to. If the `isRaw` parameter is set to `true`, `JSON.stringify()`
-is turned off and you just get a stream of objects, in case you want to do your own parsing/stringifying.
+returns a `RpcStream` that will call `methods` when written to.
+
+If `opts.raw` is set to `true`, `JSON.stringify()` is turned off and you just
+get a stream of objects, in case you want to do your own parsing/stringifying.
+
+With `opts.flattenError` you can override the default method of converting
+errors to plain js objects. For example, to include non-enumerable properties
+too, pass:
+
+```js
+{flattenError: function (err) {
+  if(!(err instanceof Error)) return err
+  var err2 = { message: err.message }
+  var props = Object.getOwnPropertyNames(err)
+  for(var k in err)
+    err2[k] = err[k]
+  return err2
+}}
+```
 
 ### RpcStream\#wrap(methodNames)
 

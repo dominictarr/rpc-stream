@@ -10,9 +10,11 @@ function get(obj, path) {
   return obj[path]
 }
 
-module.exports = function (obj, raw) {
+module.exports = function (obj, opts) {
+  if('boolean' == typeof opts) opts = { raw: opts }
+  opts = opts || {}
   var cbs = {}, count = 1, local = obj || {}
-  function flattenError(err) {
+  var flattenError = opts.flattenError || function (err) {
     if(!(err instanceof Error)) return err
     var err2 = { message: err.message }
     for(var k in err)
@@ -105,7 +107,7 @@ module.exports = function (obj, raw) {
     })
     return w
   }
-  if(raw)
+  if(opts.raw)
     return s
 
   return serialize(s)
