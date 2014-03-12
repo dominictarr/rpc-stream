@@ -31,7 +31,7 @@ update: [dnode@1.0.0](https://github.com/substack/dnode) now has first class str
 
 ## usage
 
-```
+```js
 var rpc = require('rpc-stream')
 
 //create a server, that answers questions.
@@ -65,7 +65,7 @@ the client needs to already know the names of the methods.
 accepts a string, and array of strings, or a object.
 if it's an object, `wrap` will use the keys as the method names. 
 
-```
+```js
 //create rpc around the fs module.
 var fsrpc = rpc(require('fs'))
 //pipe, etc
@@ -73,7 +73,7 @@ var fsrpc = rpc(require('fs'))
 
 then, in another process...
 
-```
+```js
 var fsrpc = rpc()
 //pipe, etc
 
