@@ -26,6 +26,18 @@ module.exports = function (obj, raw) {
       err2[k] = err[k]
     return err2
   }
+
+  if(obj) {
+    local = {}
+    function callable (k) {
+      return function (args, cb) {
+        return obj[k].apply(obj, cb ? args.concat(cb) : args)
+      }
+    }
+    for(var k in obj)
+      local[k] = callable(k)
+
+  }
   var s = through(function (data) {
     //write - on incoming call 
     data = data.slice()
