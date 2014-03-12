@@ -4,7 +4,7 @@ var test = require('tape')
 test('double callback', function (t) {
   var b = rpc()
   b.pipe(rpc({
-    hello: function (args, cb) {
+    hello: function (cb) {
       cb(null, 'first')
       cb(null, 'second')
     }
