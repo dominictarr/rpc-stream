@@ -53,6 +53,32 @@ remote.hello('JIM', function (err, mess) {
 })
 ```
 
+## over tcp
+
+server
+
+```js
+net.createServer(function(con) {
+  // create one server per connection
+  var server = rpc(/* ... */)
+  server.pipe(con).pipe(server)
+}).listen(3000))
+```
+
+client
+
+```js
+var client = rpc()
+var con = net.connect(3000)
+client.pipe(con).pipe(client)
+
+var remote = client.wrap(['hola'])
+remote.hola('steve', function(err, res) {
+  console.log(res)
+})
+```
+
+
 ### rpc(methods, opts)
 
 returns a `RpcStream` that will call `methods` when written to.
