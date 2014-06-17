@@ -1,6 +1,6 @@
 {
   "name": "rpc-stream",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "very simple rpc. use with any thing that has .pipe()",
   "homepage": "http://github.com/dominictarr/rpc-stream",
   "repository": {
