@@ -58,18 +58,9 @@ remote.hello('JIM', function (err, mess) {
 server
 
 ```js
-var net = require('net')
-var rpc = require('rpc-stream')
-
-var server = rpc({
-  hola: function (name, cb) {
-    setTimeout(function() {
-      cb(null, 'hello, '+name)
-    }, 1500)
-  }
-})
-
 net.createServer(function(con) {
+  // create one server per connection
+  var server = rpc(/* ... */)
   server.pipe(con).pipe(server)
 }).listen(3000))
 ```
@@ -77,14 +68,11 @@ net.createServer(function(con) {
 client
 
 ```js
-var net = require('net')
-var rpc = require('rpc-stream')
 var client = rpc()
-
 var con = net.connect(3000)
 client.pipe(con).pipe(client)
-var remote = client.wrap(['hola'])
 
+var remote = client.wrap(['hola'])
 remote.hola('steve', function(err, res) {
   console.log(res)
 })
