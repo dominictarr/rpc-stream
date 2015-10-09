@@ -121,7 +121,7 @@ var fsrpc = rpc()
 //pipe, etc
 
 //wrap, with the right method names.
-var remoteFs = fs.wrap(require('fs'))
+var remoteFs = fsrpc.wrap(require('fs'))
 
 remoteFs.mkdir('/tmp/whatever', function (err, dir) {
   //yay!  
